@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using WebAPI.Services;
 
 namespace WebAPI.Models
 {
@@ -9,6 +10,6 @@ namespace WebAPI.Models
         public string Password { get; set; }
         [Required]
         public string NickName { get; set; }
-        public List<Contact> ContactList { get; set; }
+        public ContactService contacts { get; set; }
     }
 }
