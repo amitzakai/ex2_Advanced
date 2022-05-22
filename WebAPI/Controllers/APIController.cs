@@ -9,37 +9,81 @@ namespace WebAPI.Controllers
     [ApiController]
     public class APIController : Controller
     {
-        private static ContactService cs = new ContactService();
-        [Route("contacts")]
+        private static UserService us = new UserService();
+
+        [Route("users")]
         [HttpGet]
-        public IActionResult getAll()
-        {
-            return Ok(cs.GetAll());
-        }
-        [Route("contacts")]
-        [HttpPost]
-        public IActionResult addC(Contact c)
-        {
-            cs.AddContact(c);
-            return Ok(cs.GetAll());
+        public IActionResult Index() {
+            return Ok(us.GetAll());
         }
 
-        [Route("contacts/{cId}")]
-        [HttpGet]
-        public IActionResult getOne(string cId)
+        [Route("users")]
+        [HttpPost]
+        public IActionResult registerUser(User U)
         {
-            Contact c = cs.Get(cId);
+            if (us.Get(U.Id) != null)
+                return NotFound("the user name already regitered");
+            U.contacts = new ContactService();
+            us.AddUser(U);
+            return Ok(U);
+        }
+
+        [Route("users/{id}")]
+        [HttpGet]
+        public IActionResult getUser(string id)
+        {
+            User U = us.Get(id);
+            if (U == null)
+                return NotFound("the user does not exist");
+            return Ok(U);
+        }
+
+
+
+        [Route("contacts/{user}")]
+        [HttpGet]
+        public IActionResult getAll(string user)
+        {
+            if (us.Get(user) == null)
+                return NotFound();
+            return Ok(us.Get(user).contacts.GetAll());
+        }
+
+        [Route("contacts/{user}")]
+        [HttpPost]
+        public IActionResult addC(string user, Contact c)
+        {
+            User U = us.Get(user);
+            if (U == null)
+                return NotFound();
+            if (us.Get(c.Id) == null)
+                return NotFound("you can add only registered users");
+            U.contacts.AddContact(c);
+            return Ok(c);
+        }
+
+        [Route("contacts/{user}/{cId}")]
+        [HttpGet]
+        public IActionResult getOne(string user, string cId)
+        {
+            User U = us.Get(user);
+            if (U == null)
+                return NotFound();
+            Contact c = U.contacts.Get(cId);
             if (c == null)
                 return NotFound();
             else
                 return Ok(c);
         }
 
-        [Route("contacts/{cId}")]
+        [Route("contacts/{user}/{cId}")]
         [HttpPut]
-        public IActionResult changeC(string cId, string s, string n)
+        public IActionResult changeC(string user, string cId, string s, string n)
         {
-            Contact c = cs.Get(cId);
+            User U = us.Get(user);
+            if (U == null)
+                return NotFound();
+            Contact c = U.contacts.Get(cId);
             if (c == null)
                 return NotFound();
             else
@@ -50,25 +94,31 @@ namespace WebAPI.Controllers
             }
         }
 
-        [Route("contacts/{cId}")]
+        [Route("contacts/{user}/{cId}")]
         [HttpDelete]
-        public IActionResult deleteC(string cId)
+        public IActionResult deleteC(string user, string cId)
         {
-            Contact c = cs.Get(cId);
+            User U = us.Get(user);
+            if (U == null)
+                return NotFound();
+            Contact c = U.contacts.Get(cId);
             if (c == null)
                 return NotFound();
             else
             {
-                cs.Delete(c.Id);
-                return Ok(cs.GetAll());
+                U.contacts.Delete(c.Id);
+                return Ok("deleted");
             }
         }
 
-        [Route("contacts/{cId}/messages")]
+        [Route("contacts/{user}/{cId}/messages")]
         [HttpGet]
-        public IActionResult getMs(string cId)
+        public IActionResult getMs(string user, string cId)
         {
-            Contact c = cs.Get(cId);
+            User U = us.Get(user);
+            if (U == null)
+                return NotFound();
+            Contact c = U.contacts.Get(cId);
             if (c == null)
                 return NotFound();
             else
@@ -77,11 +127,14 @@ namespace WebAPI.Controllers
             }
         }
 
-        [Route("contacts/{cId}/messages")]
+        [Route("contacts/{user}/{cId}/messages")]
         [HttpPost]
-        public IActionResult sendMs(string cId, string con, bool sender)
+        public IActionResult sendMs(string user, string cId, Message M)
         {
-            Contact c = cs.Get(cId);
+            User U = us.Get(user);
+            if (U == null)
+                return NotFound();
+            Contact c = U.contacts.Get(cId);
             if (c == null)
                 return NotFound();
             else
@@ -95,7 +148,7 @@ namespace WebAPI.Controllers
                 Message m = new Message()
                 {
                     Id = newId,
-                    Content = con,
+                    Content = M.Content,
                     Sent = true
                 };
                 c.messages.AddMessage(m);
@@ -103,11 +156,14 @@ namespace WebAPI.Controllers
             }
         }
 
-        [Route("contacts/{cId}/messages/{mId}")]
+        [Route("contacts/{user}/{cId}/messages/{mId}")]
         [HttpGet]
-        public IActionResult getM(string cId, int mId)
+        public IActionResult getM(string user, string cId, int mId)
         {
-            Contact c = cs.Get(cId);
+            User U = us.Get(user);
+            if (U == null)
+                return NotFound();
+            Contact c = U.contacts.Get(cId);
             if (c == null)
                 return NotFound();
             else
@@ -122,11 +178,14 @@ namespace WebAPI.Controllers
             }
         }
 
-        [Route("contacts/{cId}/messages/{mId}")]
+        [Route("contacts/{user}/{cId}/messages/{mId}")]
         [HttpPut]
-        public IActionResult changeM(string cId, int mId, string con)
+        public IActionResult changeM(string user, string cId, int mId, Message M)
         {
-            Contact c = cs.Get(cId);
+            User U = us.Get(user);
+            if (U == null)
+                return NotFound();
+            Contact c = U.contacts.Get(cId);
             if (c == null)
                 return NotFound();
             else
@@ -136,17 +195,20 @@ namespace WebAPI.Controllers
                     return NotFound();
                 else
                 {
-                    m.Content = con;
+                    m.Content = M.Content;
                     return Ok(m);
                 }
             }
         }
 
-        [Route("contacts/{cId}/messages/{mId}")]
+        [Route("contacts/{user}/{cId}/messages/{mId}")]
         [HttpDelete]
-        public IActionResult delM(string cId, int mId)
+        public IActionResult delM(string user, string cId, int mId)
         {
-            Contact c = cs.Get(cId);
+            User U = us.Get(user);
+            if (U == null)
+                return NotFound();
+            Contact c = U.contacts.Get(cId);
             if (c == null)
                 return NotFound();
             else
