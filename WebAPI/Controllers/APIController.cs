@@ -11,6 +11,9 @@ namespace WebAPI.Controllers
     {
         private static UserService us = new UserService();
 
+        int counter_invitaion = 0;
+        int counter_transfer = 0;
+
         [Route("users")]
         [HttpGet]
         public IActionResult Index() {
@@ -39,6 +42,24 @@ namespace WebAPI.Controllers
         }
 
 
+        [Route("invitaion")]
+        [HttpPost]
+        public IActionResult invite(Invitaion I) {
+            User invited = us.Get(I.to);
+            User temp = us.Get(I.from);
+            Contact inviter = new Contact()
+            {
+                Id = temp.Id,
+                NickName = temp.NickName,
+                messages = new MessageService(),
+                Server = "1111"
+
+            };
+            invited.contacts.AddContact(inviter);
+            return Ok();
+        }
+
+
 
         [Route("contacts/{user}")]
         [HttpGet]
@@ -59,6 +80,14 @@ namespace WebAPI.Controllers
             if (us.Get(c.Id) == null)
                 return NotFound("you can add only registered users");
             U.contacts.AddContact(c);
+            Invitaion i = new Invitaion()
+            {
+                Id = ++counter_invitaion,
+                from = user,
+                to = c.Id,
+                server = "0000"
+            };
+            invite(i);
             return Ok(c);
         }
 
@@ -219,7 +248,7 @@ namespace WebAPI.Controllers
                 else
                 {
                     c.messages.Delete(mId);
-                    return Ok();
+                    return Ok();//
                 }
             }
         }
