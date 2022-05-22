@@ -2,6 +2,7 @@
 
 namespace WebAPI.Services
 {
+    // user service class
     public class UserService
     {
         public List<User> users = new List<User>();
