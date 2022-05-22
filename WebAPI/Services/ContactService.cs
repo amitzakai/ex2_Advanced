@@ -13,7 +13,7 @@ namespace WebAPI.Services
         }
         public Contact Get(string id)
         {
-            return contacts.Find(x => x.Id == id);
+            return contacts.Find(x => x.id == id);
         }
         public void AddContact(Contact c)
         {
@@ -21,7 +21,7 @@ namespace WebAPI.Services
         }
         public void Delete(string id)
         {
-            contacts.Remove(contacts.Find(x => x.Id == id));
+            contacts.Remove(contacts.Find(x => x.id == id));
         }
 
         internal object? Get(object messageId)
