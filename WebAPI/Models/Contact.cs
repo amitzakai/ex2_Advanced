@@ -4,13 +4,17 @@ namespace WebAPI.Models
 {
     public class Contact
     {
-        public string Id { get; set; } //user name
+        public string id { get; set; } //user name
         [Required]
-        public string Name { get; set; }
+        public string name { get; set; } // nickname
 
-        public MessageService messages { get; set; }
+        public MessageService messages { get; set; } // check if needed
 
         [Required]
-        public string Server { get; set; }
+        public string server { get; set; }
+
+        public string? last { get; set; }
+
+        public DateTime? lastdate { get; set; }
     }
 }

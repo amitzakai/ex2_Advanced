@@ -13,7 +13,7 @@ namespace WebAPI.Services
         }
         public Message Get(int id)
         {
-            return messages.Find(x => x.Id == id);
+            return messages.Find(x => x.id == id);
         }
         public void AddMessage(Message message)
         {
@@ -21,7 +21,7 @@ namespace WebAPI.Services
         }
         public void Delete(int id)
         {
-            messages.Remove(messages.Find(x => x.Id == id));
+            messages.Remove(messages.Find(x => x.id == id));
         }
 
         internal object? Get(object messageId)

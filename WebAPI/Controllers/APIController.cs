@@ -95,7 +95,7 @@ namespace WebAPI.Controllers
             User U = us.Get(user);
             if (U == null)
                 return NotFound();
-            if (us.Get(c.Id) == null)
+            if (us.Get(c.id) == null)
                 return NotFound("you can add only registered users");
             if (U.contacts.Get(c.Id) != null)
                 return NotFound("you already have this contact");
@@ -143,8 +143,8 @@ namespace WebAPI.Controllers
                 return NotFound();
             else
             {
-                c.Name = n;
-                c.Server = s;
+                c.name = n;
+                c.server = s;
                 return Ok(c);
             }
         }
@@ -161,7 +161,7 @@ namespace WebAPI.Controllers
                 return NotFound();
             else
             {
-                U.contacts.Delete(c.Id);
+                U.contacts.Delete(c.id);
                 return Ok("deleted");
             }
         }
@@ -194,13 +194,17 @@ namespace WebAPI.Controllers
                 return NotFound();
             else
             {
+                DateTime t = new DateTime();
                 Message m = new Message()
                 {
-                    Id = c.messages.next_id(),
-                    Content = M.Content,
-                    Sent = true
+                    id = c.messages.next_id(),
+                    content = M.Content,
+                    sent = true,
+                    created = t
                 };
                 c.messages.AddMessage(m);
+                c.last = M.content;
+                c.lastdate = M.created;
                 Transfer T = new Transfer()
                 {
                     Id = 1,
@@ -252,7 +256,7 @@ namespace WebAPI.Controllers
                     return NotFound();
                 else
                 {
-                    m.Content = M.Content;
+                    m.content = M.content;
                     return Ok(m);
                 }
             }

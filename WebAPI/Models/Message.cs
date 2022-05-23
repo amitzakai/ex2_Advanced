@@ -4,13 +4,13 @@ namespace WebAPI.Models
 {
     public class Message
     {
-        public int Id { get; set; }
+        public int id { get; set; }
 
         [Required]
-        public string Content { get; set; }
+        public string content { get; set; }
         [Required]
-        public DateTime Created { get; set; }
+        public DateTime created { get; set; }
         [Required]
-        public bool Sent { get; set; }
+        public bool sent { get; set; }
     }
 }
