@@ -6,7 +6,7 @@ namespace WebAPI.Models
     {
         public string Id { get; set; } //user name
         [Required]
-        public string NickName { get; set; }
+        public string Name { get; set; }
 
         public MessageService messages { get; set; }
 
