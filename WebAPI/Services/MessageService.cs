@@ -43,7 +43,7 @@ namespace WebAPI.Services
             if (lastM == null)
                 newId = 1;
             else
-                newId = lastM.Id + 1;
+                newId = lastM.id + 1;
             return newId;
         }
     }

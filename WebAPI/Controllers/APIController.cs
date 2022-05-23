@@ -50,10 +50,10 @@ namespace WebAPI.Controllers
             User temp = us.Get(I.from);
             Contact inviter = new Contact()
             {
-                Id = temp.Id,
-                Name = temp.NickName,
+                id = temp.Id,
+                name = temp.NickName,
                 messages = new MessageService(),
-                Server = "1111"
+                server = "1111"
 
             };
             invited.contacts.AddContact(inviter);
@@ -68,10 +68,10 @@ namespace WebAPI.Controllers
             Contact sender = reciever.contacts.Get(T.from);
             Message M = new Message()
             {
-                Id = sender.messages.next_id(),
-                Content = T.content,
-                Created = new DateTime(),
-                Sent = false
+                id = sender.messages.next_id(),
+                content = T.content,
+                created = new DateTime(),
+                sent = false
 
             };
             sender.messages.AddMessage(M);
@@ -97,20 +97,20 @@ namespace WebAPI.Controllers
                 return NotFound();
             if (us.Get(c.id) == null)
                 return NotFound("you can add only registered users");
-            if (U.contacts.Get(c.Id) != null)
+            if (U.contacts.Get(c.id) != null)
                 return NotFound("you already have this contact");
             
-            Contact C = new Contact() { Id = c.Id,
-                Name = c.Name,
+            Contact C = new Contact() { id = c.id,
+                name = c.name,
                 messages = new MessageService(),
-                Server = c.Server
+                server = c.server
             };
             U.contacts.AddContact(C);
             Invitaion i = new Invitaion()
             {
                 Id = ++counter_invitaion,
                 from = user,
-                to = c.Id,
+                to = c.id,
                 server = "0000"
             };
             invite(i);
@@ -198,7 +198,7 @@ namespace WebAPI.Controllers
                 Message m = new Message()
                 {
                     id = c.messages.next_id(),
-                    content = M.Content,
+                    content = M.content,
                     sent = true,
                     created = t
                 };
@@ -209,8 +209,8 @@ namespace WebAPI.Controllers
                 {
                     Id = 1,
                     from = U.Id,
-                    to = c.Id,
-                    content = M.Content
+                    to = c.id,
+                    content = M.content
                 };
                 transfer(T);
                 return Ok(m);
