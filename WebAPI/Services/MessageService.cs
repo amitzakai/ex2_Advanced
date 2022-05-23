@@ -4,7 +4,8 @@ namespace WebAPI.Services
 {
     public class MessageService
     {
-        private static List<Message> messages = new List<Message>();
+
+        private List<Message> messages = new List<Message>();
 
         public List<Message> GetAll()
         {
@@ -33,6 +34,17 @@ namespace WebAPI.Services
             if (messages.Count == 0)
                 return null;
             return messages[messages.Count - 1];
+        }
+
+        public int next_id()
+        {
+            Message lastM = GetLast();
+            int newId;
+            if (lastM == null)
+                newId = 1;
+            else
+                newId = lastM.Id + 1;
+            return newId;
         }
     }
 }

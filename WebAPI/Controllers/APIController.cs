@@ -11,6 +11,10 @@ namespace WebAPI.Controllers
     {
         private static UserService us = new UserService();
 
+        int counter_invitaion = 0;
+
+        int counter_transfer = 0;
+
         [Route("users")]
         [HttpGet]
         public IActionResult Index() {
@@ -39,6 +43,41 @@ namespace WebAPI.Controllers
         }
 
 
+        [Route("invitaion")]
+        [HttpPost]
+        public IActionResult invite(Invitaion I) {
+            User invited = us.Get(I.to);
+            User temp = us.Get(I.from);
+            Contact inviter = new Contact()
+            {
+                Id = temp.Id,
+                Name = temp.NickName,
+                messages = new MessageService(),
+                Server = "1111"
+
+            };
+            invited.contacts.AddContact(inviter);
+            return Ok();
+        }
+
+        [Route("transfer")]
+        [HttpPost]
+        public IActionResult transfer(Transfer T)
+        {
+            User reciever = us.Get(T.to);
+            Contact sender = reciever.contacts.Get(T.from);
+            Message M = new Message()
+            {
+                Id = sender.messages.next_id(),
+                Content = T.content,
+                Created = new DateTime(),
+                Sent = false
+
+            };
+            sender.messages.AddMessage(M);
+            return Ok();
+        }
+
 
         [Route("contacts/{user}")]
         [HttpGet]
@@ -58,7 +97,23 @@ namespace WebAPI.Controllers
                 return NotFound();
             if (us.Get(c.id) == null)
                 return NotFound("you can add only registered users");
-            U.contacts.AddContact(c);
+            if (U.contacts.Get(c.Id) != null)
+                return NotFound("you already have this contact");
+            
+            Contact C = new Contact() { Id = c.Id,
+                Name = c.Name,
+                messages = new MessageService(),
+                Server = c.Server
+            };
+            U.contacts.AddContact(C);
+            Invitaion i = new Invitaion()
+            {
+                Id = ++counter_invitaion,
+                from = user,
+                to = c.Id,
+                server = "0000"
+            };
+            invite(i);
             return Ok(c);
         }
 
@@ -139,24 +194,25 @@ namespace WebAPI.Controllers
                 return NotFound();
             else
             {
-                Message lastM = c.messages.GetLast();
-                int newId;
-                if (lastM == null)
-                    newId = 1;
-                else
-                    newId = lastM.id + 1;
                 DateTime t = new DateTime();
-
                 Message m = new Message()
                 {
-                    id = newId,
-                    content = M.content,
+                    id = c.messages.next_id(),
+                    content = M.Content,
                     sent = true,
                     created = t
                 };
                 c.messages.AddMessage(m);
                 c.last = M.content;
                 c.lastdate = M.created;
+                Transfer T = new Transfer()
+                {
+                    Id = 1,
+                    from = U.Id,
+                    to = c.Id,
+                    content = M.Content
+                };
+                transfer(T);
                 return Ok(m);
             }
         }
@@ -224,7 +280,7 @@ namespace WebAPI.Controllers
                 else
                 {
                     c.messages.Delete(mId);
-                    return Ok();
+                    return Ok();//
                 }
             }
         }
