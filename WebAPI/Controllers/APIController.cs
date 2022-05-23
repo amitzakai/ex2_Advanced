@@ -12,6 +12,7 @@ namespace WebAPI.Controllers
         private static UserService us = new UserService();
 
         int counter_invitaion = 0;
+
         int counter_transfer = 0;
 
         [Route("users")]
@@ -50,7 +51,7 @@ namespace WebAPI.Controllers
             Contact inviter = new Contact()
             {
                 Id = temp.Id,
-                NickName = temp.NickName,
+                Name = temp.NickName,
                 messages = new MessageService(),
                 Server = "1111"
 
@@ -59,6 +60,23 @@ namespace WebAPI.Controllers
             return Ok();
         }
 
+        [Route("transfer")]
+        [HttpPost]
+        public IActionResult transfer(Transfer T)
+        {
+            User reciever = us.Get(T.to);
+            Contact sender = reciever.contacts.Get(T.from);
+            Message M = new Message()
+            {
+                Id = sender.messages.next_id(),
+                Content = T.content,
+                Created = new DateTime(),
+                Sent = false
+
+            };
+            sender.messages.AddMessage(M);
+            return Ok();
+        }
 
 
         [Route("contacts/{user}")]
@@ -79,7 +97,15 @@ namespace WebAPI.Controllers
                 return NotFound();
             if (us.Get(c.Id) == null)
                 return NotFound("you can add only registered users");
-            U.contacts.AddContact(c);
+            if (U.contacts.Get(c.Id) != null)
+                return NotFound("you already have this contact");
+            
+            Contact C = new Contact() { Id = c.Id,
+                Name = c.Name,
+                messages = new MessageService(),
+                Server = c.Server
+            };
+            U.contacts.AddContact(C);
             Invitaion i = new Invitaion()
             {
                 Id = ++counter_invitaion,
@@ -117,7 +143,7 @@ namespace WebAPI.Controllers
                 return NotFound();
             else
             {
-                c.NickName = n;
+                c.Name = n;
                 c.Server = s;
                 return Ok(c);
             }
@@ -168,19 +194,21 @@ namespace WebAPI.Controllers
                 return NotFound();
             else
             {
-                Message lastM = c.messages.GetLast();
-                int newId;
-                if (lastM == null)
-                    newId = 1;
-                else
-                    newId = lastM.Id + 1;
                 Message m = new Message()
                 {
-                    Id = newId,
+                    Id = c.messages.next_id(),
                     Content = M.Content,
                     Sent = true
                 };
                 c.messages.AddMessage(m);
+                Transfer T = new Transfer()
+                {
+                    Id = 1,
+                    from = U.Id,
+                    to = c.Id,
+                    content = M.Content
+                };
+                transfer(T);
                 return Ok(m);
             }
         }
