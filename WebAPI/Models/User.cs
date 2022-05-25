@@ -11,5 +11,8 @@ namespace WebAPI.Models
         [Required]
         public string NickName { get; set; }
         public ContactService contacts { get; set; }
+        public string server { get; set; }
+
+
     }
 }
