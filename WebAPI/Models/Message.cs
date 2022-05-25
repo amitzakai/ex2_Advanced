@@ -9,7 +9,7 @@ namespace WebAPI.Models
         [Required]
         public string content { get; set; }
         [Required]
-        public DateTime created { get; set; }
+        public string created { get; set; }
         [Required]
         public bool sent { get; set; }
     }

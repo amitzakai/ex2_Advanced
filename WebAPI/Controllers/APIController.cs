@@ -70,7 +70,7 @@ namespace WebAPI.Controllers
             {
                 id = sender.messages.next_id(),
                 content = T.content,
-                created = new DateTime(),
+                created = T.created,
                 sent = false
 
             };
@@ -194,13 +194,13 @@ namespace WebAPI.Controllers
                 return NotFound();
             else
             {
-                DateTime t = new DateTime();
+                //DateTime t = new DateTime();
                 Message m = new Message()
                 {
                     id = c.messages.next_id(),
                     content = M.content,
                     sent = true,
-                    created = t
+                    created = M.created
                 };
                 c.messages.AddMessage(m);
                 c.last = M.content;
@@ -210,7 +210,8 @@ namespace WebAPI.Controllers
                     Id = 1,
                     from = U.Id,
                     to = c.id,
-                    content = M.content
+                    content = M.content,
+                    created = M.created
                 };
                 transfer(T);
                 return Ok(m);
