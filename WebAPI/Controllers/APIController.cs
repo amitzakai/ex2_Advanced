@@ -28,6 +28,7 @@ namespace WebAPI.Controllers
             if (us.Get(U.Id) != null)
                 return NotFound("the user name already regitered");
             U.contacts = new ContactService();
+            U.server = "7249";
             us.AddUser(U);
             return Ok(U);
         }
@@ -47,13 +48,12 @@ namespace WebAPI.Controllers
         [HttpPost]
         public IActionResult invite(Invitaion I) {
             User invited = us.Get(I.to);
-            User temp = us.Get(I.from);
             Contact inviter = new Contact()
             {
-                id = temp.Id,
-                name = temp.NickName,
+                id = I.from,
+                name = I.from,
                 messages = new MessageService(),
-                server = "1111"
+                server = I.server,
 
             };
             invited.contacts.AddContact(inviter);
@@ -70,7 +70,7 @@ namespace WebAPI.Controllers
             {
                 id = sender.messages.next_id(),
                 content = T.content,
-                created = T.created,
+                created = DateTime.Now.ToString("HH:mm"),
                 sent = false
 
             };
@@ -95,25 +95,16 @@ namespace WebAPI.Controllers
             User U = us.Get(user);
             if (U == null)
                 return NotFound();
-            if (us.Get(c.id) == null)
-                return NotFound("you can add only registered users");
             if (U.contacts.Get(c.id) != null)
                 return NotFound("you already have this contact");
             
-            Contact C = new Contact() { id = c.id,
+            Contact C = new Contact() {
+                id = c.id,
                 name = c.name,
                 messages = new MessageService(),
                 server = c.server
             };
-            U.contacts.AddContact(C);
-            Invitaion i = new Invitaion()
-            {
-                Id = ++counter_invitaion,
-                from = user,
-                to = c.id,
-                server = "0000"
-            };
-            invite(i);
+            U.contacts.AddContact(C); 
             return Ok(c);
         }
 
@@ -194,26 +185,16 @@ namespace WebAPI.Controllers
                 return NotFound();
             else
             {
-                //DateTime t = new DateTime();
                 Message m = new Message()
                 {
                     id = c.messages.next_id(),
                     content = M.content,
-                    sent = true,
+                    sent = M.sent,
                     created = M.created
                 };
                 c.messages.AddMessage(m);
                 c.last = M.content;
                 c.lastdate = M.created;
-                Transfer T = new Transfer()
-                {
-                    Id = 1,
-                    from = U.Id,
-                    to = c.id,
-                    content = M.content,
-                    created = M.created
-                };
-                transfer(T);
                 return Ok(m);
             }
         }
