@@ -1,10 +1,21 @@
 ﻿@model IEnumerable<ex2_server.Models.Ratings>
-
 @{
     ViewData["Title"] = "Index";
+    double average = 0, sum = 0;
+    int i = 0;
+    foreach(var x in Model)
+    {
+        i++;
+        sum += x.rate;
+    }
+    if (i != 0)
+    {
+        average = sum / i;
+    }
+    
 }
 
-<h1>Index</h1>
+<h1>Average Rating: @string.Format("{0:0.0.0}", average)</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
