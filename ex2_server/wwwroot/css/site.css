@@ -4,7 +4,8 @@ html {
 
 @media (min-width: 768px) {
   html {
-    font-size: 16px;
+    font-size: 20px;
+    //border-width: medium;
   }
 }
 
@@ -14,5 +15,7 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+  background-image: url('/pic/marvel2.png');
+  //margin: 0;
 }
+
