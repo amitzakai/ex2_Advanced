@@ -44,7 +44,7 @@ namespace WebAPI.Controllers
         }
 
 
-        [Route("invitaion")]
+        [Route("invitations")]
         [HttpPost]
         public IActionResult invite(Invitation I) {
             User invited = us.Get(I.to);
